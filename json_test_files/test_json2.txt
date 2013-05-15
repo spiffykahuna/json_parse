@@ -1,0 +1,41 @@
+{
+    "string": "lorem ipsum",
+    "utf string": "lorem ipsum",
+    "utf-8 string": "あいうえお",
+    "positive one": 1,
+    "negative one": -1,
+    "pi": 3.14,
+    "hard to parse number": -0.000314,
+    "boolean true": true,
+    "boolean false": false,
+    "null": null,
+    "string array": [
+        "lorem",
+        "ipsum"
+    ],
+    "x^2 array": [
+        0,
+        1,
+        4,
+        9,
+        16,
+        25,
+        36,
+        49,
+        64,
+        81,
+        100
+    ],
+    "object_empty": {},
+    "object": {
+        "nested string": "str",
+        "nested true": true,
+        "nested false": false,
+        "nested null": null,
+        "nested number": 123,
+        "nested array": [
+            "lorem",
+            "ipsum"
+        ]
+    }
+}
