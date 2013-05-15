@@ -26,6 +26,11 @@
 #endif
 
 
+#define JSMN_STRICT
+#define JSMN_PARENT_LINKS
+#define LENGTH(x) (sizeof(x)/sizeof(*(x)))
+
+
 typedef enum {
 	JSON_NULL = 1,
 	JSON_PRIMITIVE = 2,
@@ -71,7 +76,7 @@ json_t* json_alloc(json_type objectType, size_t childrenCount);
 void* json_malloc(size_t size);
 void json_free (void* ptr);
 
-void json_object_free(json_t*  /* root */);
+void json_object_free(json_t**  /* root */);
 
 json_error_t* json_append_child(json_t* /* root */, json_t* /* child*/);
 

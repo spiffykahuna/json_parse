@@ -106,6 +106,10 @@ void test_json_token_tostr(void)
 
 void test_json_from_string(void) {
 	char *js = json_test_object;
+	char *invalid;
+	char *invalidFileName;
+	int i;
+
 	assertNotNull(&js);
 
 	json_t *root = NULL;
@@ -114,7 +118,7 @@ void test_json_from_string(void) {
 	assertNotNull(&root);
 	assertTrue(root != NULL);
 
-	json_object_free(root);
+	json_object_free(&root);
 
 	root = NULL;
 
@@ -126,6 +130,45 @@ void test_json_from_string(void) {
 
 	json_free(parseError->errorMsg);
 	json_free(parseError);
+	json_object_free(&root);
+
+	char * invalidSet[] = {
+			""
+			,"[]]"
+			, "{}}"
+			, "{ \"foo\" : \"bar\", [ 0 ] : \"a\" }"
+//			, "{ \"foo\" : \"bar\", \"a\" }"
+	};
+
+	for(i = 0; i < LENGTH(invalidSet); i++) {
+		invalid = invalidSet[i];
+		parseError = json_from_string(invalid, &root);
+		assertNull(root);
+		assertNotNull(parseError);
+
+		json_free(parseError->errorMsg);
+		json_free(parseError);
+		json_object_free(&root);
+	}
+
+	char * invalidFileSet[] = {
+		"json_test_files/invalid_01.json"
+	};
+
+	for (i = 0; i < LENGTH(invalidFileSet); ++i) {
+		invalidFileName = invalidFileSet[i];
+		invalid = readJSONFromFile(invalidFileName);
+
+//		puts(invalid);
+//		parseError = json_from_string(invalid, &root);
+//		assertNull(root);
+//		assertNotNull(parseError);
+////		puts(parseError->errorMsg->value);
+//		json_free(parseError->errorMsg);
+//		json_free(parseError);
+//		json_object_free(&root);
+
+	}
 
 }
 
@@ -310,7 +353,7 @@ void test_json_object_get(void) {
 	assertStringEquals(nestedValue->value, "[\"lorem\", \"ipsum\"]");
 
 
-	json_object_free(root);
+	json_object_free(&root);
 }
 
 void testObfuscatedJson(void) {
@@ -361,7 +404,7 @@ void test_json_to_string(void) {
 	string = json_to_string(root);
 	assertStringEquals(string->value, js);
 	strbuffer_destroy(string);
-	json_object_free(root);
+	json_object_free(&root);
 	root = NULL;
 
 	js = "{ \"key\" : 1 }";
@@ -381,7 +424,7 @@ void test_json_to_string(void) {
 	string = json_to_string(key);
 	assertStringEquals(string->value, "1");
 	strbuffer_destroy(string);
-	json_object_free(root);
+	json_object_free(&root);
 	root = NULL;
 
 	js = "{ \"hard to parse number\" : -3.14e-4, \"pi\" : 3.14, \"some\" : null }";
@@ -418,7 +461,7 @@ void test_json_to_string(void) {
 	assertStringEquals(string->value, "null");
 	strbuffer_destroy(string);
 
-	json_object_free(root);
+	json_object_free(&root);
 	root = NULL;
 
 	js = "[ 0, 1, 4, 9, 16, 25, 36, 49, 64, 81, 100 ]";
@@ -430,7 +473,7 @@ void test_json_to_string(void) {
 	string = json_to_string(root);
 	assertStringEquals(string->value, js);
 	strbuffer_destroy(string);
-	json_object_free(root);
+	json_object_free(&root);
 	root = NULL;
 
 	js = "[ \"lorem\", \"ipsum\" ]";
@@ -442,7 +485,7 @@ void test_json_to_string(void) {
 	string = json_to_string(root);
 	assertStringEquals(string->value, js);
 	strbuffer_destroy(string);
-	json_object_free(root);
+	json_object_free(&root);
 	root = NULL;
 
 	js = "{ \"object\": { \"nested string\" : \"str\", \"nested true\" : true, \"nested false\" : false, \"nested null\" : null, \"nested number\" : 123, \"nested array\" : [ \"lorem\", \"ipsum\" ] }}";
@@ -454,7 +497,7 @@ void test_json_to_string(void) {
 	string = json_to_string(root);
 
 	strbuffer_destroy(string);
-	json_object_free(root);
+	json_object_free(&root);
 	root = NULL;
 
 
@@ -475,7 +518,7 @@ char* readJSONFromFile(const char *fileName) {
 	lSize = ftell(pFile);
 	rewind(pFile);
 	// allocate memory to contain the whole file:
-	buffer = (char*) malloc(sizeof(char) * lSize);
+	buffer = (char*) json_malloc(sizeof(char) * lSize);
 	if (buffer == NULL ) {
 		fputs("Memory error", stderr);
 		exit(2);

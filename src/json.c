@@ -135,23 +135,23 @@ json_error_t* json_append_child(json_t *root, json_t *child) {
 	return NULL; /* exit without any error */
 }
 
-void json_object_free(json_t *root) {
+void json_object_free(json_t **root) {
 
-//	json_t* last;
+	json_t* object = *root;
 //	json_t* next;
 
-	if(root == NULL) {
+	if(object == NULL) {
 		return;
 	}
 
-	if(root->children != NULL) {
-		json_object_free(root->children);
-		root->children = NULL;
+	if(object->children != NULL) {
+		json_object_free(&object->children);
+		object->children = NULL;
 	}
 
-	if(root->next != NULL) {
-		json_object_free(root->next);
-		root->next = NULL;
+	if(object->next != NULL) {
+		json_object_free(&object->next);
+		object->next = NULL;
 	}
 
 //	if(root->last != NULL) {
@@ -159,11 +159,13 @@ void json_object_free(json_t *root) {
 //		root->last = NULL;
 //	}
 
-	if(root->value != NULL) {
-		json_free(root->value);
-		root->value = NULL;
+	if(object->value != NULL) {
+		json_free(object->value);
+		object->value = NULL;
 	}
-	json_free(root);
+	json_free(object);
+	object = NULL;
+	root = NULL;
 }
 
 
@@ -334,9 +336,9 @@ strbuffer_t * json_object_to_string(json_t* object){
 
 inline
 void freeResources(json_t* root, json_t* key, json_t* value) {
-	json_object_free(root);
-	json_object_free(key);
-	json_object_free(value);
+	json_object_free(&root);
+	json_object_free(&key);
+	json_object_free(&value);
 }
 
 json_error_t* createJsonObject(
@@ -860,7 +862,7 @@ json_error_t * json_from_string(char *jsonString, json_t **destObject) {
 		parseError = createJsonObject(&root, jsonString, tokens, TOKENS_COUNT, &tokenIndex );
 
 		if(parseError != NULL) {
-			json_object_free(root);
+			json_object_free(&root);
 			return parseError;
 		}
 
